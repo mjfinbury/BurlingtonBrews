@@ -8,27 +8,16 @@
 import UIKit
 
 class ItemsViewController: UITableViewController {
-    
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // If the triggered segue is the "showItem" segue
-        switch segue.identifier {
-        case "showItem"?:
-       // Figure out which row was just tapped
-       if let row = tableView.indexPathForSelectedRow?.row {
-       // Get the item associated with this row and pass it along
-       let item = itemStore.allItems[row]
-       let DetailViewController
-       = segue.destination as! DetailViewController
-       DetailViewController.item = item
-       }
-        default:
-       preconditionFailure("Unexpected segue identifier.")
-        }
-       }
+
     
     var itemStore: ItemStore!
     
-    @IBAction func addNewItem(_ sender: UIButton) {
+    required init?(coder aDecoder: NSCoder) {
+     super.init(coder: aDecoder)
+     navigationItem.leftBarButtonItem = editButtonItem
+    }
+    
+    @IBAction func addNewItem(_ sender: UIBarButtonItem) {
        // Create a new item and add it to the store
         let newItem = itemStore.createItem()
          // Figure out where that item is in the array
@@ -38,20 +27,7 @@ class ItemsViewController: UITableViewController {
             tableView.insertRows(at: [indexPath], with: .automatic)
          }
     }
-    @IBAction func toggleEditingMode(_ sender: UIButton) {
-        // If you are currently in editing mode...
-         if isEditing {
-        // Change text of button to inform user of state
-        sender.setTitle("Edit", for: .normal)
-        // Turn off editing mode
-        setEditing(false, animated: true)
-         } else {
-        // Change text of button to inform user of state
-        sender.setTitle("Done", for: .normal)
-        // Enter editing mode
-        setEditing(true, animated: true)
-         }
-    }
+
 
 override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
    return itemStore.allItems.count
@@ -59,7 +35,7 @@ override func tableView(_ tableView: UITableView, numberOfRowsInSection section:
     override func tableView(_ tableView: UITableView,
     cellForRowAt indexPath: IndexPath) -> UITableViewCell {
      // Create an instance of UITableViewCell, with default appearance
-     let cell = UITableViewCell(style: .value1, reuseIdentifier: "UITableViewCell")
+    let cell = tableView.dequeueReusableCell(withIdentifier: "UITableViewCell", for: indexPath)
      // Set the text on the cell with the description of the item
      // that is at the nth index of items, where n = row this cell
      // will appear in on the tableview
@@ -98,5 +74,32 @@ override func tableView(_ tableView: UITableView, numberOfRowsInSection section:
              // Update the model
              itemStore.moveItem(from: sourceIndexPath.row, to: destinationIndexPath.row)
             }
-   
+    override func viewDidLoad() {
+     super.viewDidLoad()
+        tableView.rowHeight = UITableView.automaticDimension
+        tableView.rowHeight = 65
+    }
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+     // If the triggered segue is the "showItem" segue
+     switch segue.identifier {
+     case "showItem"?:
+    // Figure out which row was just tapped
+    if let row = tableView.indexPathForSelectedRow?.row {
+    // Get the item associated with this row and pass it along
+    let item = itemStore.allItems[row]
+    let detailViewController
+    = segue.destination as! DetailViewController
+    detailViewController.item = item
+    }
+     default:
+    preconditionFailure("Unexpected segue identifier.")
+     }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+     super.viewWillAppear(animated)
+     tableView.reloadData()
+    }
 }
+   
+

@@ -8,7 +8,7 @@
 
 import UIKit
 
-class Item: NSObject {
+class Item: NSObject, NSCoding  {
     var name: String
     var style: String?
     var percent: Int
@@ -19,10 +19,21 @@ class Item: NSObject {
         self.style = style
         self.percent = percent
         self.dateCreated = Date()
-        
         super.init()
     }
-    
+    func encode(with aCoder: NSCoder) {
+    aCoder.encode(name, forKey: "name")
+    aCoder.encode(dateCreated, forKey: "dateCreated")
+    aCoder.encode(style, forKey: "style")
+    aCoder.encode(percent, forKey: "percent")
+    }
+    required init(coder aDecoder: NSCoder) {
+    name = aDecoder.decodeObject(forKey: "name") as! String
+    dateCreated = aDecoder.decodeObject(forKey: "dateCreated") as! Date
+    style = aDecoder.decodeObject(forKey: "style") as! String?
+    percent = aDecoder.decodeInteger(forKey: "percent")
+     super.init()
+    }
     
   convenience init(random: Bool = false) {
    if random {
@@ -33,14 +44,15 @@ class Item: NSObject {
   idx = arc4random_uniform(UInt32(nouns.count))
   let randomNoun = nouns[Int(idx)]
   let randomName = "\(randomAdjective) \(randomNoun)"
-  let randomValue = Int(arc4random_uniform(100))
+  let randomvalue = Int(arc4random_uniform(100))
   let randomSerialNumber =
   UUID().uuidString.components(separatedBy: "-").first!
-  self.init(name: randomName,
-  style: randomSerialNumber,
-  percent: randomValue)
+  self.init(
+    name: randomName,
+    style: randomSerialNumber,
+    percent: randomvalue)
    } else {
-  self.init(name: "", style: nil, percent: 0)
+    self.init(name: "", style: nil, percent: 0)
    }
   }
 }

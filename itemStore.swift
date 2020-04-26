@@ -7,21 +7,34 @@
 //
 import UIKit
 class ItemStore {
-    init(){
-        createItemSpecific(name:"Fiddlehead", style: "IPA", percent: 5)
-        createItemSpecific(name:"Citizen Cider Lake Hopper", style: "Dry Cider", percent: 4)
-        createItemSpecific(name:"Magic Hat Single Chair", style: "IPA",percent: 5)
-        createItemSpecific(name:"Switchback", style: "IPA", percent: 6)
-        createItemSpecific(name:"Zero Gravity", style: "IPA", percent: 5)
-    }
-   
+    let itemArchiveURL: URL = {
+            let documentsDirectories =
+           FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+            let documentDirectory = documentsDirectories.first!
+            return documentDirectory.appendingPathComponent("items.archive")
+               
+           }()
+  init(){
+    createItemSpecific(name:"Fiddlehead", style: "IPA", percent: 5)
+    createItemSpecific(name:"Citizen Cider Lake Hopper", style: "Dry Cider", percent: 4)
+    createItemSpecific(name:"Magic Hat Single Chair", style: "IPA", percent: 4)
+    createItemSpecific(name:"Switchback", style: "IPA", percent: 6)
+    createItemSpecific(name:"Zero Gravity", style: "IPA", percent: 5)
+   }
+
+  func saveChanges() -> Bool {
+   print("Saving items to: \(itemArchiveURL.path)")
+   return NSKeyedArchiver.archiveRootObject(allItems, toFile: itemArchiveURL.path)
+  }
+    
 var allItems = [Item]()
+    
     @discardableResult func createItemSpecific(name: String, style: String, percent: Int) -> Item {
-           let newItem = Item(name: name, style: style, percent: percent)
+        let newItem = Item(name: name, style: style, percent: percent)
            allItems.append(newItem)
            return newItem
+       
     }
-        
   
     @discardableResult func createItem() -> Item {
         let newItem = Item(random: true)
